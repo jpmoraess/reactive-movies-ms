@@ -1,0 +1,4 @@
+# Project exclude paths
+/.gradle/
+/movies-info-service/build/
+/movies-info-service/build/classes/java/main/
