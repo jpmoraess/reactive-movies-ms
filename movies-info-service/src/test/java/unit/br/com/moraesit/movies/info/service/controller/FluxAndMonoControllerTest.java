@@ -73,4 +73,21 @@ class FluxAndMonoControllerTest {
                     assert "hello-world".equals(Objects.requireNonNull(responseBody));
                 });
     }
+
+    @Test
+    void stream() {
+        var stream = webTestClient
+                .get()
+                .uri("/stream")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(Long.class)
+                .getResponseBody();
+
+        StepVerifier.create(stream)
+                .expectNext(0L, 1L, 2L, 3L)
+                .thenCancel()
+                .verify();
+    }
 }
