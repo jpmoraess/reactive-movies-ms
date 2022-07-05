@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataMongoTest
 @TestPropertySource(properties = "spring.mongodb.embedded.version=3.5.5")
@@ -64,6 +65,24 @@ class MovieInfoRepositoryIntegrationTest {
                     assertEquals(LocalDate.of(2012, 7, 20), movieInfo.getReleaseDate());
                     assertEquals("Dark Knight Rises", movieInfo.getName());
                     assertEquals(2, movieInfo.getCast().size());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void saveMovieInfo() {
+        var movieInfo = new MovieInfo(null, "Batman Begins X", 2005,
+                List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        var movieInfoMono = movieInfoRepository.save(movieInfo).log();
+
+        StepVerifier.create(movieInfoMono)
+                .assertNext(movieInfo1 -> {
+                    assertNotNull(movieInfo1.getMovieInfoId());
+                    assertEquals(2005, movieInfo1.getYear());
+                    assertEquals(LocalDate.of(2005, 6, 15), movieInfo1.getReleaseDate());
+                    assertEquals("Batman Begins X", movieInfo1.getName());
+                    assertEquals(2, movieInfo1.getCast().size());
                 })
                 .verifyComplete();
     }
