@@ -107,4 +107,31 @@ class MoviesInfoControllerIntegrationTest {
                 });
 
     }
+
+    @Test
+    void updateMovieInfo() {
+        var movieInfoId = "abc";
+
+        var updateMovieInfo = new MovieInfo("abc", "Batman Begins Updated", 2022,
+                List.of("Christian Bale"), LocalDate.parse("2022-06-15"));
+
+        webTestClient
+                .put()
+                .uri(MOVIE_INFOS_URL + "/{id}", movieInfoId)
+                .bodyValue(updateMovieInfo)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var updatedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(updatedMovieInfo);
+                    assertNotNull(updatedMovieInfo.getMovieInfoId());
+                    assertEquals("Batman Begins Updated", updatedMovieInfo.getName());
+                    assertEquals(2022, updatedMovieInfo.getYear());
+                    assertEquals(LocalDate.of(2022, 6, 15), updatedMovieInfo.getReleaseDate());
+                    assertEquals(1, updatedMovieInfo.getCast().size());
+                });
+
+    }
 }
