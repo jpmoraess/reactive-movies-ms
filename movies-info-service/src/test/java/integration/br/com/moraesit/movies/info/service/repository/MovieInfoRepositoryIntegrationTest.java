@@ -86,4 +86,25 @@ class MovieInfoRepositoryIntegrationTest {
                 })
                 .verifyComplete();
     }
+
+    @Test
+    void updateMovieInfo() {
+        var movieInfo = movieInfoRepository.findById("abc").block();
+        assertNotNull(movieInfo);
+
+        movieInfo.setYear(2021);
+        movieInfo.setReleaseDate(LocalDate.of(2021, 6, 15));
+
+        var movieInfoMono = movieInfoRepository.save(movieInfo).log();
+
+        StepVerifier.create(movieInfoMono)
+                .assertNext(movieInfo1 -> {
+                    assertNotNull(movieInfo1.getMovieInfoId());
+                    assertEquals(2021, movieInfo1.getYear());
+                    assertEquals(LocalDate.of(2021, 6, 15), movieInfo1.getReleaseDate());
+                    assertEquals("Dark Knight Rises", movieInfo1.getName());
+                    assertEquals(2, movieInfo1.getCast().size());
+                })
+                .verifyComplete();
+    }
 }
