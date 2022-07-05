@@ -107,4 +107,15 @@ class MovieInfoRepositoryIntegrationTest {
                 })
                 .verifyComplete();
     }
+
+    @Test
+    void deleteMovieInfo() {
+        movieInfoRepository.deleteById("abc").block();
+
+        var moviesInfoFlux = movieInfoRepository.findAll().log();
+
+        StepVerifier.create(moviesInfoFlux)
+                .expectNextCount(2)
+                .verifyComplete();
+    }
 }
