@@ -125,7 +125,8 @@ public class MoviesInfoControllerUnitTest {
                 .consumeWith(stringEntityExchangeResult -> {
                     var responseBody = stringEntityExchangeResult.getResponseBody();
                     assertNotNull(responseBody);
-                    System.out.println("responseBody: " + responseBody);
+                    var expectedErrorMessage = "movieInfo.name must be present,movieInfo.year must be a positive";
+                    assertEquals(responseBody, expectedErrorMessage);
                 });
     }
 
