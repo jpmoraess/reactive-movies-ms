@@ -4,6 +4,7 @@ import br.com.moraesit.movies.info.service.domain.MovieInfo;
 import br.com.moraesit.movies.info.service.repository.MovieInfoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -18,5 +19,9 @@ public class MoviesInfoService {
 
     public Mono<MovieInfo> addMovieInfo(MovieInfo movieInfo) {
         return movieInfoRepository.save(movieInfo);
+    }
+
+    public Flux<MovieInfo> getAllMovieInfos() {
+        return movieInfoRepository.findAll();
     }
 }
