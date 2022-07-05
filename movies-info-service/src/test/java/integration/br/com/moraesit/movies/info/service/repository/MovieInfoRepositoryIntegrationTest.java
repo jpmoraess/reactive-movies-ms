@@ -13,6 +13,8 @@ import reactor.test.StepVerifier;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @DataMongoTest
 @TestPropertySource(properties = "spring.mongodb.embedded.version=3.5.5")
 @ActiveProfiles("test")
@@ -30,7 +32,7 @@ class MovieInfoRepositoryIntegrationTest {
                 new MovieInfo(null, "The Dark Knight", 2008,
                         List.of("Christian Bale", "HeathLedger"), LocalDate.parse("2008-07-18")),
 
-                new MovieInfo(null, "Dark Knight Rises", 2012,
+                new MovieInfo("abc", "Dark Knight Rises", 2012,
                         List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2012-07-20"))
         );
 
@@ -49,6 +51,20 @@ class MovieInfoRepositoryIntegrationTest {
 
         StepVerifier.create(moviesInfoFlux)
                 .expectNextCount(3)
+                .verifyComplete();
+    }
+
+    @Test
+    void findById() {
+        var movieInfoMono = movieInfoRepository.findById("abc").log();
+
+        StepVerifier.create(movieInfoMono)
+                .assertNext(movieInfo -> {
+                    assertEquals(2012, movieInfo.getYear());
+                    assertEquals(LocalDate.of(2012, 7, 20), movieInfo.getReleaseDate());
+                    assertEquals("Dark Knight Rises", movieInfo.getName());
+                    assertEquals(2, movieInfo.getCast().size());
+                })
                 .verifyComplete();
     }
 }
