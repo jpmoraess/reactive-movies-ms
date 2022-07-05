@@ -134,4 +134,16 @@ class MoviesInfoControllerIntegrationTest {
                 });
 
     }
+
+    @Test
+    void deleteMovieInfo() {
+        var movieInfoId = "abc";
+
+        webTestClient
+                .delete()
+                .uri(MOVIE_INFOS_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
 }
