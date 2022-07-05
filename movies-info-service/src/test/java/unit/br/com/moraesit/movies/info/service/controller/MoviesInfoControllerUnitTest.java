@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = MoviesInfoController.class)
@@ -74,6 +75,37 @@ public class MoviesInfoControllerUnitTest {
                     var movieInfo1 = movieInfoEntityExchangeResult.getResponseBody();
                     assertNotNull(movieInfo1);
                     assertEquals("Dark Knight Rises", movieInfo1.getName());
+                });
+    }
+
+    @Test
+    void addMovieInfo() {
+        var movieInfo = new MovieInfo(null, "Batman Begins1", 2005,
+                List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        when(moviesInfoServiceMock.addMovieInfo(isA(MovieInfo.class)))
+                .thenReturn(Mono.just(
+                        new MovieInfo("mockId", "Batman Begins1", 2005,
+                                List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"))
+                ));
+
+        webTestClient
+                .post()
+                .uri(MOVIE_INFOS_URL)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(savedMovieInfo);
+                    assertNotNull(savedMovieInfo.getMovieInfoId());
+                    assertEquals("mockId", savedMovieInfo.getMovieInfoId());
+                    assertEquals("Batman Begins1", savedMovieInfo.getName());
+                    assertEquals(2005, savedMovieInfo.getYear());
+                    assertEquals(2, savedMovieInfo.getCast().size());
+                    assertEquals(LocalDate.of(2005, 6, 15), savedMovieInfo.getReleaseDate());
                 });
     }
 }
