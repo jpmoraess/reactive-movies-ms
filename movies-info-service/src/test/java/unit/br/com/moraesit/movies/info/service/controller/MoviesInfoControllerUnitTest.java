@@ -108,4 +108,37 @@ public class MoviesInfoControllerUnitTest {
                     assertEquals(LocalDate.of(2005, 6, 15), savedMovieInfo.getReleaseDate());
                 });
     }
+
+    @Test
+    void updateMovieInfo() {
+        var movieInfoId = "abc";
+
+        var movieInfo = new MovieInfo(null, "Batman Begins", 2022,
+                List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2022-06-15"));
+
+        when(moviesInfoServiceMock.updateMovieInfo(isA(String.class), isA(MovieInfo.class)))
+                .thenReturn(Mono.just(
+                        new MovieInfo(movieInfoId, "Batman Begins Updated", 2023,
+                                List.of("Christian Bale"), LocalDate.parse("2023-06-15"))
+                ));
+
+        webTestClient
+                .put()
+                .uri(MOVIE_INFOS_URL + "/{id}", movieInfoId)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var updatedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(updatedMovieInfo);
+                    assertNotNull(updatedMovieInfo.getMovieInfoId());
+                    assertEquals("Batman Begins Updated", updatedMovieInfo.getName());
+                    assertEquals(2023, updatedMovieInfo.getYear());
+                    assertEquals(LocalDate.of(2023, 6, 15), updatedMovieInfo.getReleaseDate());
+                    assertEquals(1, updatedMovieInfo.getCast().size());
+                });
+
+    }
 }
