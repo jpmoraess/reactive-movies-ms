@@ -19,7 +19,7 @@ public class FluxAndMonoController {
 
     @GetMapping("/mono")
     public Mono<String> helloWorldMono() {
-        return Mono.just("hello-worl")
+        return Mono.just("hello-world")
                 .log();
     }
 
