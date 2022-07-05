@@ -112,7 +112,7 @@ public class MoviesInfoControllerUnitTest {
     @Test
     void addMovieInfo_validation() {
         var movieInfo = new MovieInfo(null, "", -2010,
-                List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+                List.of(""), LocalDate.parse("2005-06-15"));
 
         webTestClient
                 .post()
@@ -125,8 +125,8 @@ public class MoviesInfoControllerUnitTest {
                 .consumeWith(stringEntityExchangeResult -> {
                     var responseBody = stringEntityExchangeResult.getResponseBody();
                     assertNotNull(responseBody);
-                    var expectedErrorMessage = "movieInfo.name must be present,movieInfo.year must be a positive";
-                    assertEquals(responseBody, expectedErrorMessage);
+                    var expectedErrorMessage = "movieInfo.cast must be present,movieInfo.name must be present,movieInfo.year must be a positive";
+                    assertEquals(expectedErrorMessage, responseBody);
                 });
     }
 
