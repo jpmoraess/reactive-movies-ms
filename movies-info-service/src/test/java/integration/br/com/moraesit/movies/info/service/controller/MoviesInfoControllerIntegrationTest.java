@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
@@ -68,8 +69,8 @@ class MoviesInfoControllerIntegrationTest {
                 .expectBody(MovieInfo.class)
                 .consumeWith(movieInfoEntityExchangeResult -> {
                     var savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
-                    assert savedMovieInfo != null;
-                    assert savedMovieInfo.getMovieInfoId() != null;
+                    assertNotNull(savedMovieInfo);
+                    assertNotNull(savedMovieInfo.getMovieInfoId());
                     assertEquals("Batman Begins1", savedMovieInfo.getName());
                 });
 
@@ -85,5 +86,25 @@ class MoviesInfoControllerIntegrationTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+    }
+
+    @Test
+    void getMovieInfoById() {
+        String movieInfoId = "abc";
+
+        webTestClient
+                .get()
+                .uri(MOVIE_INFOS_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var movieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(movieInfo);
+                    assertEquals("Dark Knight Rises", movieInfo.getName());
+                    assertEquals(2012, movieInfo.getYear());
+                });
+
     }
 }
