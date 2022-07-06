@@ -67,6 +67,17 @@ class MovieInfoRepositoryIntegrationTest {
     }
 
     @Test
+    void findByName() {
+        var name = "The Dark Knight";
+
+        var moviesInfoFlux = movieInfoRepository.findByName(name).log();
+
+        StepVerifier.create(moviesInfoFlux)
+                .expectNextCount(1)
+                .verifyComplete();
+    }
+
+    @Test
     void findById() {
         var movieInfoMono = movieInfoRepository.findById("abc").log();
 
