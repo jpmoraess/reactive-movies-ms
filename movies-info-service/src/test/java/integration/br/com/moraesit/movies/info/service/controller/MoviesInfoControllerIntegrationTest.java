@@ -146,4 +146,20 @@ class MoviesInfoControllerIntegrationTest {
                 .expectStatus()
                 .isNoContent();
     }
+
+    @Test
+    void updateMovieInfo_notFound() {
+        var movieInfoId = "def";
+
+        var updateMovieInfo = new MovieInfo(null, "Batman Begins Updated", 2022,
+                List.of("Christian Bale"), LocalDate.parse("2022-06-15"));
+
+        webTestClient
+                .put()
+                .uri(MOVIE_INFOS_URL + "/{id}", movieInfoId)
+                .bodyValue(updateMovieInfo)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
 }

@@ -3,6 +3,7 @@ package br.com.moraesit.movies.info.service.controller;
 import br.com.moraesit.movies.info.service.domain.MovieInfo;
 import br.com.moraesit.movies.info.service.service.MoviesInfoService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,9 +37,11 @@ public class MoviesInfoController {
     }
 
     @PutMapping("/movieinfos/{movieInfoId}")
-    public Mono<MovieInfo> updateMovieInfo(@PathVariable String movieInfoId,
-                                           @RequestBody MovieInfo updateMovieInfo) {
-        return moviesInfoService.updateMovieInfo(movieInfoId, updateMovieInfo);
+    public Mono<ResponseEntity<MovieInfo>> updateMovieInfo(@PathVariable String movieInfoId,
+                                                           @RequestBody MovieInfo updateMovieInfo) {
+        return moviesInfoService.updateMovieInfo(movieInfoId, updateMovieInfo)
+                .map(ResponseEntity.ok()::body)
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @DeleteMapping("/movieinfos/{movieInfoId}")
