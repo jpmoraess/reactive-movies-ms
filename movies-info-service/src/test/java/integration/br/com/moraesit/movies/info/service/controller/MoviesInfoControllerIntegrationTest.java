@@ -109,6 +109,18 @@ class MoviesInfoControllerIntegrationTest {
     }
 
     @Test
+    void getMovieInfoById_notFound() {
+        String movieInfoId = "def";
+
+        webTestClient
+                .get()
+                .uri(MOVIE_INFOS_URL + "/{id}", movieInfoId)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void updateMovieInfo() {
         var movieInfoId = "abc";
 
