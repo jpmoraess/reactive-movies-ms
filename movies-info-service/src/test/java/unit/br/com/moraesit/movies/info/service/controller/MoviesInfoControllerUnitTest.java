@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -54,6 +55,33 @@ public class MoviesInfoControllerUnitTest {
                 .is2xxSuccessful()
                 .expectBodyList(MovieInfo.class)
                 .hasSize(3);
+    }
+
+    @Test
+    void searchMovieInfos() {
+        var moviesInfo = List.of(
+                new MovieInfo(null, "The Dark Knight", 2008,
+                        List.of("Christian Bale", "HeathLedger"), LocalDate.parse("2008-07-18"))
+        );
+
+        var movieInfo = new MovieInfo();
+        movieInfo.setName("ht");
+
+        when(moviesInfoServiceMock.searchMovieInfos(movieInfo))
+                .thenReturn(Flux.fromIterable(moviesInfo));
+
+        var uri = UriComponentsBuilder.fromUriString(MOVIE_INFOS_URL + "/search")
+                .queryParam("name", "ht")
+                .buildAndExpand().toUri();
+
+        webTestClient
+                .get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(1);
     }
 
     @Test

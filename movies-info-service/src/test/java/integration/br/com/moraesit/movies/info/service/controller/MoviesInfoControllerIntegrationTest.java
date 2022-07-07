@@ -106,6 +106,22 @@ class MoviesInfoControllerIntegrationTest {
     }
 
     @Test
+    void searchMovieInfos() {
+        var uri = UriComponentsBuilder.fromUriString(MOVIE_INFOS_URL + "/search")
+                .queryParam("name", "Kni")
+                .buildAndExpand().toUri();
+
+        webTestClient
+                .get()
+                .uri(uri)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(MovieInfo.class)
+                .hasSize(2);
+    }
+
+    @Test
     void getMovieInfoById() {
         String movieInfoId = "abc";
 

@@ -27,6 +27,11 @@ public class MoviesInfoController {
         return moviesInfoService.getAllMovieInfos();
     }
 
+    @GetMapping("/movieinfos/search")
+    public Flux<MovieInfo> searchMovieInfos(MovieInfo movieInfo) {
+        return moviesInfoService.searchMovieInfos(movieInfo);
+    }
+
     @GetMapping("/movieinfos/{movieInfoId}")
     public Mono<ResponseEntity<MovieInfo>> getMovieInfoById(@PathVariable String movieInfoId) {
         return moviesInfoService.getMovieInfoById(movieInfoId)

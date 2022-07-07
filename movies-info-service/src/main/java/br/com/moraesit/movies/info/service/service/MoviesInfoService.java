@@ -3,6 +3,8 @@ package br.com.moraesit.movies.info.service.service;
 import br.com.moraesit.movies.info.service.domain.MovieInfo;
 import br.com.moraesit.movies.info.service.repository.MovieInfoRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,6 +25,14 @@ public class MoviesInfoService {
 
     public Flux<MovieInfo> getAllMovieInfos() {
         return movieInfoRepository.findAll();
+    }
+
+    public Flux<MovieInfo> searchMovieInfos(MovieInfo movieInfo) {
+        return movieInfoRepository.findAll(Example.of(movieInfo, ExampleMatcher
+                .matching()
+                .withIgnoreCase()
+                .withIgnoreNullValues()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)));
     }
 
     public Mono<MovieInfo> getMovieInfoById(String movieInfoId) {
