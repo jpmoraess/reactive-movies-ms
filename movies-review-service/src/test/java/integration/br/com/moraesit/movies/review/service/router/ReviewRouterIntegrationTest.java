@@ -69,4 +69,16 @@ class ReviewRouterIntegrationTest {
                     assertEquals(9.0, savedReview.getRating());
                 });
     }
+
+    @Test
+    void getReviews() {
+        webTestClient
+                .get()
+                .uri(REVIEWS_URL)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(Review.class)
+                .hasSize(3);
+    }
 }
