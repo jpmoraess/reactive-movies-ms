@@ -1,3 +1,4 @@
 rootProject.name = 'reactive-movies-ms'
 include 'movies-info-service'
+include 'movies-review-service'
 
