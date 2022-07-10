@@ -35,8 +35,8 @@ class ReviewRouterIntegrationTest {
     void setUp() {
         var reviews = List.of(
                 new Review(null, 1L, "Awesome Movie", 9.0),
-                new Review("kde", 2L, "Fantastic Movie", 8.5),
-                new Review("abc", 3L, "Bad Movie", 3.0)
+                new Review(null, 1L, "Fantastic Movie", 8.5),
+                new Review(null, 2L, "Bad Movie", 3.0)
         );
 
         reviewReactiveRepository.saveAll(reviews).blockLast();
@@ -78,18 +78,27 @@ class ReviewRouterIntegrationTest {
                 .expectStatus()
                 .isOk()
                 .expectBodyList(Review.class)
-                .hasSize(3);
+                .hasSize(3)
+                .value(reviews -> {
+                    assertEquals(3, reviews.size());
+                });
     }
 
     @Test
     void updateReview() {
-        var reviewId = "abc";
-        var reviewToUpdate = new Review("abc", 3L, "it's not so bad", 5.3);
+        var review = new Review(null, 1L, "Awesome Movie", 9.0);
+
+        var savedReview = reviewReactiveRepository.save(review).block();
+
+        var reviewUpdate = new Review(null, 1L, "Not an Awesome Movie", 8.0);
+
+        assertNotNull(savedReview);
+        assertNotNull(savedReview.getReviewId());
 
         webTestClient
                 .put()
-                .uri(REVIEWS_URL + "/{id}", reviewId)
-                .bodyValue(reviewToUpdate)
+                .uri(REVIEWS_URL + "/{id}", savedReview.getReviewId())
+                .bodyValue(reviewUpdate)
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -97,9 +106,42 @@ class ReviewRouterIntegrationTest {
                 .consumeWith(reviewEntityExchangeResult -> {
                     var updatedReview = reviewEntityExchangeResult.getResponseBody();
                     assertNotNull(updatedReview);
-                    assertEquals("it's not so bad", updatedReview.getComment());
-                    assertEquals(5.3, updatedReview.getRating());
-                    assertEquals(3L, updatedReview.getMovieInfoId());
+                    assertNotNull(updatedReview.getReviewId());
+                    assertEquals(8.0, updatedReview.getRating());
+                    assertEquals("Not an Awesome Movie", updatedReview.getComment());
+                });
+    }
+
+    @Test
+    void deleteReview() {
+        var review = new Review(null, 1L, "Awesome Movie", 9.0);
+        var savedReview = reviewReactiveRepository.save(review).block();
+
+        assertNotNull(savedReview);
+        assertNotNull(savedReview.getReviewId());
+
+        webTestClient
+                .delete()
+                .uri(REVIEWS_URL + "/{id}", savedReview.getReviewId())
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
+
+    @Test
+    void getReviewsByMovieInfoId() {
+        webTestClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path(REVIEWS_URL)
+                        .queryParam("movieInfoId", "1")
+                        .build())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(Review.class)
+                .value(reviews -> {
+                    System.out.println("reviews : " + reviews);
+                    assertEquals(2, reviews.size());
                 });
     }
 }
