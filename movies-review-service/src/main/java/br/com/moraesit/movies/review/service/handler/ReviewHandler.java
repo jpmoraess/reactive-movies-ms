@@ -25,7 +25,17 @@ public class ReviewHandler {
     }
 
     public Mono<ServerResponse> getReviews(ServerRequest request) {
-        Flux<Review> reviews = reviewReactiveRepository.findAll();
+        var movieInfoId = request.queryParam("movieInfoId");
+        final Flux<Review> reviews;
+        if (movieInfoId.isPresent()) {
+            reviews = reviewReactiveRepository.findReviewsByMovieInfoId(Long.valueOf(movieInfoId.get()));
+        } else {
+            reviews = reviewReactiveRepository.findAll();
+        }
+        return buildReviewsResponse(reviews);
+    }
+
+    private Mono<ServerResponse> buildReviewsResponse(Flux<Review> reviews) {
         return ServerResponse.ok().body(reviews, Review.class);
     }
 
